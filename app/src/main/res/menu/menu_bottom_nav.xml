@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@id/camera_fragment"
+        android:icon="@drawable/camera_icon2"
+        android:title="Translator" />
+
+    <item
+        android:id="@id/dictionary_fragment"
+        android:icon="@drawable/dictionary_icon"
+        android:title="BIM Dictionary" />
+
+    <item
+        android:id="@id/transcript_fragment"
+        android:icon="@drawable/transcribe_icon"
+        android:title="Voice Transcript" />
+
+</menu>
