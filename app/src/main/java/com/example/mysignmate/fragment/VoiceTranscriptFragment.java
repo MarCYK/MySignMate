@@ -41,7 +41,9 @@ import java.util.ArrayList;
 public class VoiceTranscriptFragment extends Fragment {
     private static final String TAG = "VoiceTranscriptFragment";
 
+    // whisper-tiny.tflite and whisper-base-nooptim.en.tflite works well
     private static final String DEFAULT_MODEL_TO_USE = "whisper-tiny.tflite";
+    // English only model ends with extension ".en.tflite"
     private static final String ENGLISH_ONLY_MODEL_EXTENSION = ".en.tflite";
     private static final String ENGLISH_ONLY_VOCAB_FILE = "filters_vocab_en.bin";
     private static final String MULTILINGUAL_VOCAB_FILE = "filters_vocab_multilingual.bin";
@@ -72,12 +74,14 @@ public class VoiceTranscriptFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_transcript, container, false);
 
+        // Call the method to copy specific file types from assets to data folder
         sdcardDataFolder = requireContext().getExternalFilesDir(null);
         copyAssetsToSdcard(requireContext(), sdcardDataFolder, EXTENSIONS_TO_COPY);
 
         ArrayList<File> tfliteFiles = getFilesWithExtension(sdcardDataFolder, ".tflite");
         ArrayList<File> waveFiles = getFilesWithExtension(sdcardDataFolder, ".wav");
 
+        // Initialize default model to use
         selectedTfliteFile = new File(sdcardDataFolder, DEFAULT_MODEL_TO_USE);
 
         Spinner spinnerTflite = view.findViewById(R.id.spnrTfliteFiles);
@@ -99,8 +103,10 @@ public class VoiceTranscriptFragment extends Fragment {
         spinnerWave.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Cast item to File and get the file name
                 selectedWaveFile = (File) parent.getItemAtPosition(position);
 
+                // Check if the selected file is the recording file
                 if (selectedWaveFile.getName().equals(WaveUtil.RECORDING_FILE)) {
                     btnRecord.setVisibility(View.VISIBLE);
                 } else {
@@ -113,6 +119,7 @@ public class VoiceTranscriptFragment extends Fragment {
             }
         });
 
+        // Implementation of record button functionality
         btnRecord = view.findViewById(R.id.btnRecord);
         btnRecord.setOnClickListener(v -> {
             if (mRecorder != null && mRecorder.isInProgress()) {
@@ -124,6 +131,7 @@ public class VoiceTranscriptFragment extends Fragment {
             }
         });
 
+        // Implementation of Play button functionality
         btnPlay = view.findViewById(R.id.btnPlay);
         btnPlay.setOnClickListener(v -> {
             if (!mPlayer.isPlaying()) {
@@ -134,6 +142,7 @@ public class VoiceTranscriptFragment extends Fragment {
             }
         });
 
+        // Implementation of transcribe button functionality
         btnTranscribe = view.findViewById(R.id.btnTranscb);
         btnTranscribe.setOnClickListener(v -> {
             if (mRecorder != null && mRecorder.isInProgress()) {
@@ -171,12 +180,16 @@ public class VoiceTranscriptFragment extends Fragment {
         tvResult = view.findViewById(R.id.tvResult);
         fabCopy = view.findViewById(R.id.fabCopy);
         fabCopy.setOnClickListener(v -> {
+            // Get the text from tvResult
             String textToCopy = tvResult.getText().toString();
+
+            // Copy the text to the clipboard
             ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("Copied Text", textToCopy);
             clipboard.setPrimaryClip(clip);
         });
 
+        // Audio recording functionality
         mRecorder = new Recorder(requireContext());
         mRecorder.setListener(new Recorder.RecorderListener() {
             @Override
@@ -197,6 +210,7 @@ public class VoiceTranscriptFragment extends Fragment {
             }
         });
 
+        // Audio playback functionality
         mPlayer = new Player(requireContext());
         mPlayer.setListener(new Player.PlaybackListener() {
             @Override
@@ -210,6 +224,7 @@ public class VoiceTranscriptFragment extends Fragment {
             }
         });
 
+        // Assume this Activity is the current activity, check record permission
         checkRecordPermission();
 
         return view;
@@ -219,6 +234,9 @@ public class VoiceTranscriptFragment extends Fragment {
         boolean isMultilingualModel = !(modelFile.getName().endsWith(ENGLISH_ONLY_MODEL_EXTENSION));
         String vocabFileName = isMultilingualModel ? MULTILINGUAL_VOCAB_FILE : ENGLISH_ONLY_VOCAB_FILE;
         File vocabFile = new File(sdcardDataFolder, vocabFileName);
+
+//        boolean isMultilingualModel = true; // Force the model to be multilingual
+//        File vocabFile = new File(sdcardDataFolder, MULTILINGUAL_VOCAB_FILE); // Use the multilingual vocabulary file
 
         mWhisper = new Whisper(requireContext());
         mWhisper.loadModel(modelFile, vocabFile, isMultilingualModel);
@@ -289,7 +307,10 @@ public class VoiceTranscriptFragment extends Fragment {
 
     private void checkRecordPermission() {
         int permission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "Record permission is granted");
+        } else {
+            Log.d(TAG, "Requesting record permission");
             requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 0);
         }
     }
@@ -316,6 +337,7 @@ public class VoiceTranscriptFragment extends Fragment {
         mRecorder.stop();
     }
 
+    // Transcription calls
     private void startTranscription(String waveFilePath) {
         mWhisper.setFilePath(waveFilePath);
         mWhisper.setAction(Whisper.ACTION_TRANSCRIBE);
@@ -326,6 +348,7 @@ public class VoiceTranscriptFragment extends Fragment {
         mWhisper.stop();
     }
 
+    // Copy assets with specified extensions to destination folder
     private static void copyAssetsToSdcard(Context context, File destFolder, String[] extensions) {
         AssetManager assetManager = context.getAssets();
 
@@ -349,7 +372,7 @@ public class VoiceTranscriptFragment extends Fragment {
                                 outputStream.write(buffer, 0, bytesRead);
                             }
                         }
-                        break;
+                        break; // No need to check further extensions
                     }
                 }
             }
@@ -361,9 +384,11 @@ public class VoiceTranscriptFragment extends Fragment {
     public ArrayList<File> getFilesWithExtension(File directory, String extension) {
         ArrayList<File> filteredFiles = new ArrayList<>();
 
+        // Check if the directory is accessible
         if (directory != null && directory.exists()) {
             File[] files = directory.listFiles();
 
+            // Filter files by the provided extension
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile() && file.getName().endsWith(extension)) {
@@ -377,23 +402,26 @@ public class VoiceTranscriptFragment extends Fragment {
     }
 
     static class SharedResource {
+        // Synchronized method for Thread 1 to wait for a signal with a timeout
         public synchronized boolean waitForSignalWithTimeout(long timeoutMillis) {
             long startTime = System.currentTimeMillis();
 
             try {
-                wait(timeoutMillis);
+                wait(timeoutMillis); // Wait for the given timeout
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return false;
+                Thread.currentThread().interrupt(); // Restore interrupt status
+                return false; // Thread interruption as timeout
             }
 
             long elapsedTime = System.currentTimeMillis() - startTime;
 
-            return elapsedTime < timeoutMillis;
+            // Check if wait returned due to notify or timeout
+            return elapsedTime < timeoutMillis; // True if notified, False if timeout
         }
 
+        // Synchronized method for Thread 2 to send a signal
         public synchronized void sendSignal() {
-            notify();
+            notify(); // Notifies the waiting thread
         }
     }
 }

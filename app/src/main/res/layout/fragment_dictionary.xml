@@ -49,7 +49,5 @@
         tools:itemCount="29"
         tools:listitem="@layout/item_dictionary" >
 
-
-
     </androidx.recyclerview.widget.RecyclerView>
 </RelativeLayout>

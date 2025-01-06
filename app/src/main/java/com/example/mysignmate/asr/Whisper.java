@@ -69,6 +69,12 @@ public class Whisper {
 
     public void loadModel(String modelPath, String vocabPath, boolean isMultilingual) {
         try {
+            if(isMultilingual) {
+                Log.d(TAG, "Loading multilingual model...");
+            } else {
+                Log.d(TAG, "Loading English model...");
+            }
+
             mWhisperEngine.initialize(modelPath, vocabPath, isMultilingual);
         } catch (IOException e) {
             Log.e(TAG, "Error initializing model...", e);

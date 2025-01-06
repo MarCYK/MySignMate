@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@android:color/white"
     tools:context=".fragment.DictionaryFragment">
 
     <androidx.cardview.widget.CardView
@@ -16,13 +17,12 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         app:cardCornerRadius="10dp"
-        >
+        app:cardBackgroundColor="@android:color/white">
 
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="112dp"
-            >
+            android:layout_height="112dp">
 
             <ImageView
                 android:id="@+id/img_sign"
@@ -30,20 +30,20 @@
                 android:layout_height="100dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:scaleType="centerCrop"
                 android:layout_marginEnd="10dp"
-                />
+                android:scaleType="centerCrop" />
 
             <TextView
                 android:id="@+id/sign_word"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="8dp"
+                android:padding="10dp"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="8dp"
-                android:padding="10dp"/>
+                android:textColor="@android:color/black" />
 
 
         </RelativeLayout>

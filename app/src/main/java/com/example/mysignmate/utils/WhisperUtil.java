@@ -377,9 +377,8 @@ public class WhisperUtil {
         private ArrayList<InputLang> getLangList() {
             ArrayList<InputLang> inputLangList = new ArrayList<>();
             inputLangList.add(new InputLang("English", "en", 50259));
-            inputLangList.add(new InputLang("Spanish", "es", 50262));
-            inputLangList.add(new InputLang("Hindi", "hi", 50276));
-            inputLangList.add(new InputLang("Telugu", "te", 50299));
+            inputLangList.add(new InputLang("Chinese", "zh", 50265));
+            inputLangList.add(new InputLang("Malay", "ms", 50300));
             return inputLangList;
         }
     }
