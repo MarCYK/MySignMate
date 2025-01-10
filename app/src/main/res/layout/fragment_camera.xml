@@ -10,7 +10,9 @@
         android:id="@+id/view_finder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:scaleType="fillStart" />
+        app:scaleType="fillStart" >
+
+    </androidx.camera.view.PreviewView>
 
     <com.example.mysignmate.OverlayView
         android:id="@+id/overlay"
@@ -24,8 +26,17 @@
         android:layout_gravity="top|start"
         android:layout_margin="16dp"
         android:theme="@style/Theme.AppCompat.DayNight"
-        android:background="@drawable/baseline_flip_camera_ios_24"
-        />
+        android:background="@drawable/baseline_flip_camera_ios_24" />
+
+    <Button
+        android:id="@+id/toggleOverlayButton"
+        android:layout_width="49dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="72dp"
+        android:theme="@style/Theme.AppCompat.DayNight"
+        android:background="@drawable/baseline_overlay_24" />
 
     <Button
         android:id="@+id/btnClearSentence"
@@ -39,6 +50,16 @@
         android:layout_marginStart="310dp"
         android:layout_centerHorizontal="true"
         android:onClick="onClearSentenceButtonClick" />
+
+    <TextView
+        android:id="@+id/gestureTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:text="Predicting..." />
 
     <include
         android:id="@+id/bottom_sheet_layout"

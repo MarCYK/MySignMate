@@ -42,7 +42,11 @@ public class VoiceTranscriptFragment extends Fragment {
     private static final String TAG = "VoiceTranscriptFragment";
 
     // whisper-tiny.tflite and whisper-base-nooptim.en.tflite works well
-    private static final String DEFAULT_MODEL_TO_USE = "whisper-tiny.tflite";
+    private static final String DEFAULT_MODEL_TO_USE = "Malay.tflite";
+    // language model ends with extension ".tflite"
+    private static final String CHINESE_MODEL = "Chinese.tflite";
+    private static final String ENGLISH_MODEL = "English.tflite";
+    private static final String MALAY_MODEL = "Malay.tflite";
     // English only model ends with extension ".en.tflite"
     private static final String ENGLISH_ONLY_MODEL_EXTENSION = ".en.tflite";
     private static final String ENGLISH_ONLY_VOCAB_FILE = "filters_vocab_en.bin";
@@ -82,7 +86,18 @@ public class VoiceTranscriptFragment extends Fragment {
         ArrayList<File> waveFiles = getFilesWithExtension(sdcardDataFolder, ".wav");
 
         // Initialize default model to use
-        selectedTfliteFile = new File(sdcardDataFolder, DEFAULT_MODEL_TO_USE);
+//        selectedTfliteFile = new File(sdcardDataFolder, DEFAULT_MODEL_TO_USE);
+
+        // Ensure "Malay.tflite" is at the top
+        File malayModel = new File(sdcardDataFolder, MALAY_MODEL);
+        File englishModel = new File(sdcardDataFolder, ENGLISH_MODEL);
+        tfliteFiles.remove(malayModel);
+        tfliteFiles.remove(englishModel);
+        tfliteFiles.add(0, malayModel);
+        tfliteFiles.add(1, englishModel);
+
+        // Initialize default model to use
+        selectedTfliteFile = malayModel;
 
         Spinner spinnerTflite = view.findViewById(R.id.spnrTfliteFiles);
         spinnerTflite.setAdapter(getFileArrayAdapter(tfliteFiles));

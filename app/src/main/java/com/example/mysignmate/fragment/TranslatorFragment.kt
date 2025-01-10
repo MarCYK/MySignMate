@@ -5,6 +5,7 @@ import org.pytorch.LiteModuleLoader
 import org.pytorch.Module
 import org.pytorch.Tensor
 import android.content.Context
+import android.util.Log
 import com.example.mysignmate.databinding.FragmentCameraBinding
 import com.google.mediapipe.tasks.components.containers.NormalizedLandmark
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
@@ -13,6 +14,8 @@ import org.pytorch.IValue
 
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 
 class TranslatorFragment : Fragment() {
@@ -25,8 +28,16 @@ class TranslatorFragment : Fragment() {
         private var outputTensor: Tensor? = null
         private var _fragmentCameraBinding: FragmentCameraBinding? = null
 
+        private var xScale = 31 / 100f
+        private var yScale = 1f
+        private var zScale = 18 / 100f
+
         private val fragmentCameraBinding
             get() = _fragmentCameraBinding!!
+
+        private val confidenceThreshold = 0.75f
+        private var consecutiveGestureCount = 0
+        private var lastGesture = ""
 
         fun processLandmarks(
             poseResult: PoseLandmarkerResult?,
@@ -63,9 +74,9 @@ class TranslatorFragment : Fragment() {
                 // Flatten pose landmarks: x, y, z, visibility
                 val poseList = poseLandmarksList.flatMap { res ->
                     listOf(
-                        res.x() ?: 0.00000000e+00f,
-                        res.y() ?: 0.00000000e+00f,
-                        res.z() ?: 0.00000000e+00f,
+                        res.x(),
+                        res.y(),
+                        res.z(),
                         res.visibility()?.orElse(0.00000000e+00f) ?: 0.00000000e+00f
                     )
                 }
@@ -76,9 +87,9 @@ class TranslatorFragment : Fragment() {
                 // Flatten hand landmarks: x, y, z
                 val leftHandList = handLandmarksList.flatMap { res ->
                     listOf(
-                        res.x() ?: 0.00000000e+00f,
-                        res.y() ?: 0.00000000e+00f,
-                        res.z() ?: 0.00000000e+00f
+                        res.x(),
+                        res.y(),
+                        res.z(),
                     )
                 }
                 // Pad the hand landmarks to ensure they have 63 elements
@@ -88,9 +99,9 @@ class TranslatorFragment : Fragment() {
                 // Flatten hand landmarks: x, y, z
                 val rightHandList = handLandmarksList.flatMap { res ->
                     listOf(
-                        res.x() ?: 0.00000000e+00f,
-                        res.y() ?: 0.00000000e+00f,
-                        res.z() ?: 0.00000000e+00f
+                        res.x(),
+                        res.y(),
+                        res.z(),
                     )
                 }
                 // Pad the hand landmarks to ensure they have 63 elements
@@ -101,11 +112,7 @@ class TranslatorFragment : Fragment() {
             // Normalize the landmarks before adding to the sequence
             val normalizedLandmarks = normalizeLandmarks(listOf(finalLandmarks))
 
-//            println(normalizedLandmarks.map { it.toList() })
-
             sequence.addAll(normalizedLandmarks.map { it.toList() })
-
-//            sequence.add(finalLandmarks as List<Float>)
 
             // Ensure the sequence doesn't exceed 30
             if (sequence.size > 30) {
@@ -117,14 +124,13 @@ class TranslatorFragment : Fragment() {
                 try {
                     // Load the model if not already loaded
                     if (module == null) {
-                        module = LiteModuleLoader.load(assetFilePath(context, "lstm_model_6.95.ptl"))
+                        module = LiteModuleLoader.load(assetFilePath(context, "lstm_model.ptl"))
+//                        module = LiteModuleLoader.load(assetFilePath(context, "transformer_model.ptl"))
                     }
 
                     if (module != null) {
                         // Preprocess the sequence of landmarks
                         val inputTensor = preprocessLandmarks(sequence)
-
-                        val confidenceThreshold = 0.8f
 
                         // Perform inference or other operations with the loaded model and tensor
                         outputTensor = module!!.forward(IValue.from(inputTensor)).toTensor()
@@ -146,17 +152,42 @@ class TranslatorFragment : Fragment() {
                             predictions.add(maxScoreIdx)
                             val gesture = GestureClasses.GESTURE_CLASSES[maxScoreIdx]
 
-                            val lastPredictions = predictions.takeLast(10)
+                            if (gesture == "RESET") {
+                                sequence.clear()
+                                return null
+                            }
+
+                            val lastPredictions = predictions.takeLast(20)
                             val uniquePredictions = lastPredictions.distinct()
 
                             if (uniquePredictions.size == 1 && uniquePredictions[0] == maxScoreIdx) {
                                 val currentGesture = gesture
-                                if (sentence.isNotEmpty() && currentGesture != sentence.last()) {
-                                    sentence.add(currentGesture)
-                                } else if (sentence.isEmpty()) {
-                                    sentence.add(currentGesture)
+                                if (currentGesture == lastGesture) {
+                                    consecutiveGestureCount++
+                                } else {
+                                    consecutiveGestureCount = 1
+                                    lastGesture = currentGesture
+                                }
+
+                                // Gesture is detected consecutively for 5 frames
+                                if (consecutiveGestureCount >= 15) { // Change the threshold as needed
+                                    if (sentence.isNotEmpty() && currentGesture != sentence.last()) {
+                                        sentence.add(currentGesture)
+                                    } else if (sentence.isEmpty()) {
+                                        sentence.add(currentGesture)
+                                    }
+                                    consecutiveGestureCount = 0 // Reset count after adding to sentence
                                 }
                             }
+
+//                            if (uniquePredictions.size == 1 && uniquePredictions[0] == maxScoreIdx) {
+//                                val currentGesture = gesture
+//                                if (sentence.isNotEmpty() && currentGesture != sentence.last()) {
+//                                    sentence.add(currentGesture)
+//                                } else if (sentence.isEmpty()) {
+//                                    sentence.add(currentGesture)
+//                                }
+//                            }
 
                             if (sentence.size > 4) {
                                 sentence = sentence.takeLast(4).toMutableList()
@@ -176,6 +207,14 @@ class TranslatorFragment : Fragment() {
                 println("Received empty landmarks or sequence size less than 30 in Translator")
             }
             return null // Return null for conditions where gesture inference couldn't happen
+        }
+
+        fun updateScalingFactors(xScale: Float, yScale: Float, zScale: Float) {
+            this.xScale = xScale
+            this.yScale = yScale
+            this.zScale = zScale
+
+            Log.d("scale", "updateScalingFactors: $xScale, $yScale, $zScale")
         }
 
         // Dirty Scaling since webcam and phone camera has different resolution
@@ -201,15 +240,15 @@ class TranslatorFragment : Fragment() {
                     (leftShoulder[1] + rightShoulder[1]) / 2f
                 )
                 val nose = poseKeypoints[NOSE].subList(0, 2)
-                val normFactor = Math.sqrt(
-                    Math.pow((nose[0] - neck[0]).toDouble(), 2.0) +
-                            Math.pow((nose[1] - neck[1]).toDouble(), 2.0)
+                val normFactor = sqrt(
+                    (nose[0] - neck[0]).toDouble().pow(2.0) +
+                            (nose[1] - neck[1]).toDouble().pow(2.0)
                 ).toFloat().takeIf { it != 0f } ?: 1f
 
                 // Scale factors for x, y, z
-                val xScale = 1 / 10f
-                val yScale = 1 / 1f
-                val zScale = 1 / 8f
+//                val xScale = 1/10f
+//                val yScale = 1f
+//                val zScale = 1/8f
 
                 // Normalize pose keypoints
                 val normalizedPose = poseKeypoints.map {
@@ -220,6 +259,9 @@ class TranslatorFragment : Fragment() {
                         it[3] // Visibility remains unchanged
                     )
                 }
+
+                // Debugging
+                println(normalizedPose[32].toList())
 
                 // Normalize hand keypoints
                 fun normalizeHand(handKeypoints: List<List<Float>>, wristKeypoint: List<Float>): List<FloatArray> {
@@ -247,6 +289,7 @@ class TranslatorFragment : Fragment() {
 
                 normalizedSequence.add(normalizedLandmarks.toFloatArray())
             }
+
             return normalizedSequence
         }
 

@@ -31,7 +31,8 @@ public class Whisper {
     public static final Action ACTION_TRANSLATE = Action.TRANSLATE;
 
     private enum Action {
-        TRANSLATE, TRANSCRIBE
+        TRANSLATE,
+        TRANSCRIBE
     }
 
     private final AtomicBoolean mInProgress = new AtomicBoolean(false);

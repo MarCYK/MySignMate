@@ -1,5 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,7 +22,7 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:textColor="@android:color/black"
-            android:text="Select model: "
+            android:text="Select language: "
             android:layout_weight="1"
             android:layout_marginEnd="8dp" />
 
@@ -67,7 +70,8 @@
             android:layout_margin="3dp"
             android:layout_weight="1"
             android:textSize="15sp"
-            android:background="@drawable/rounded_button_background"
+            android:backgroundTint="@color/themecolor"
+            android:textColor="@android:color/white"
             android:text="@string/record" />
 
         <Button
@@ -77,7 +81,8 @@
             android:layout_margin="3dp"
             android:layout_weight="1"
             android:textSize="15sp"
-            android:background="@drawable/rounded_button_background"
+            android:backgroundTint="@color/themecolor"
+            android:textColor="@android:color/white"
             android:text="@string/play" />
 
         <Button
@@ -87,7 +92,8 @@
             android:layout_margin="3dp"
             android:layout_weight="1"
             android:textSize="15sp"
-            android:background="@drawable/rounded_button_background"
+            android:backgroundTint="@color/themecolor"
+            android:textColor="@android:color/white"
             android:text="@string/transcribe" />
     </LinearLayout>
 
@@ -131,6 +137,7 @@
             android:id="@+id/tvResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/black"
             android:textSize="17sp" />
     </ScrollView>
 
@@ -141,7 +148,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@android:drawable/ic_menu_save"
-        android:contentDescription="Copy" />
+        android:src="@drawable/save_24dp_xml"
+        android:contentDescription="Copy"
+        app:backgroundTint="@color/themecolor"/>
 
 </LinearLayout>

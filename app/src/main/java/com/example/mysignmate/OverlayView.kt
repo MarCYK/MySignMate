@@ -30,9 +30,13 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
     private var leftHandPointPaint = Paint()
     private var rightHandPointPaint = Paint()
 
+    private var rectangle = Paint()
+
     private var scaleFactor: Float = 1f
     private var imageWidth: Int = 1
     private var imageHeight: Int = 1
+
+    private var overlayEnabled: Boolean = true
 
     init {
         initPaints()
@@ -53,26 +57,37 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
         poseLinePaint.color = Color.BLUE
         poseLinePaint.strokeWidth = LANDMARK_STROKE_WIDTH
         poseLinePaint.style = Paint.Style.STROKE
+//        poseLinePaint.alpha = 85
 
         posePointPaint.color = Color.GREEN
         posePointPaint.strokeWidth = LANDMARK_STROKE_WIDTH
         posePointPaint.style = Paint.Style.FILL
+//        posePointPaint.alpha = 85
 
         handLinePaint.color = Color.YELLOW
         handLinePaint.strokeWidth = LANDMARK_STROKE_WIDTH
         handLinePaint.style = Paint.Style.STROKE
+//        handLinePaint.alpha = 85
 
         handPointPaint.color = Color.RED
         handPointPaint.strokeWidth = LANDMARK_STROKE_WIDTH
         handPointPaint.style = Paint.Style.FILL
+//        handPointPaint.alpha = 85
 
         leftHandPointPaint.color = Color.CYAN
         leftHandPointPaint.strokeWidth = LANDMARK_STROKE_WIDTH
         leftHandPointPaint.style = Paint.Style.FILL
+//        leftHandPointPaint.alpha = 85
 
         rightHandPointPaint.color = Color.MAGENTA
         rightHandPointPaint.strokeWidth = LANDMARK_STROKE_WIDTH
         rightHandPointPaint.style = Paint.Style.FILL
+//        rightHandPointPaint.alpha = 85
+
+        rectangle.color = Color.RED
+        rectangle.strokeWidth = 10f
+        rectangle.style = Paint.Style.STROKE
+        rectangle.alpha = 75
     }
 
     // Check handedness
@@ -91,9 +106,22 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
         return false
     }
 
+    fun setOverlayEnabled(enabled: Boolean) {
+        overlayEnabled = enabled
+        invalidate()
+    }
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
+        if(!overlayEnabled) return
+
+        // Draw a bounding box in the center of the view
+        val left = width * 0.35f
+        val top = height * 0.25f
+        val right = width * 0.65f
+        val bottom = height * 0.45f
+        canvas.drawRect(left, top, right, bottom, rectangle)
+
         poseResults?.let { poseLandmarkerResult ->
             for(landmark in poseLandmarkerResult.landmarks()) {
                 for(normalizedLandmark in landmark) {

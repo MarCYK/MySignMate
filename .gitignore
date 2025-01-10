@@ -31,3 +31,7 @@ google-services.json
 
 # Android Profiling
 *.hprof
+*.tflite
+app/src/main/assets/Chinese.tflite
+app/src/main/assets/English.tflite
+app/src/main/assets/Malay.tflite

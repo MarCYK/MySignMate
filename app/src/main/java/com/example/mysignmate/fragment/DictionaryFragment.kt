@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mysignmate.DictionaryAdapter
 import com.example.mysignmate.DictionaryItem
-import com.example.mysignmate.R  // Your R class containing resource IDs
+import com.example.mysignmate.R
 
 class DictionaryFragment : Fragment() {
 
@@ -26,7 +26,6 @@ class DictionaryFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_dictionary, container, false)
 
-        // Assuming you have a RecyclerView in your layout with ID list_dictionary
         val recyclerView: RecyclerView = view.findViewById(R.id.list_dictionary)
 
         // Sample data (replace with your actual data)
