@@ -32,7 +32,61 @@
         </RelativeLayout>
 
 
-        <!-- Inference time row for Pose -->
+<!--        &lt;!&ndash; Inference time row for Pose &ndash;&gt;-->
+<!--        <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="@dimen/bottom_sheet_default_row_margin"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/pose_inference_time_label"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:text="@string/label_pose_inference_time"-->
+<!--                android:textColor="@color/bottom_sheet_text_color"-->
+<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/pose_inference_time_val"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:gravity="end"-->
+<!--                android:text="0ms"-->
+<!--                android:textColor="@color/bottom_sheet_text_color"-->
+<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
+<!--        </androidx.appcompat.widget.LinearLayoutCompat>-->
+
+<!--        &lt;!&ndash; Inference time row for Hand &ndash;&gt;-->
+<!--        <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="@dimen/bottom_sheet_default_row_margin"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/hand_inference_time_label"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:text="@string/label_hand_inference_time"-->
+<!--                android:textColor="@color/bottom_sheet_text_color"-->
+<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/hand_inference_time_val"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:gravity="end"-->
+<!--                android:text="0ms"-->
+<!--                android:textColor="@color/bottom_sheet_text_color"-->
+<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
+<!--        </androidx.appcompat.widget.LinearLayoutCompat>-->
+
+        <!-- Inference time row combined -->
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,16 +94,16 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/pose_inference_time_label"
+                android:id="@+id/inference_time_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="@string/label_pose_inference_time"
+                android:text="@string/label_inference_time"
                 android:textColor="@color/bottom_sheet_text_color"
                 android:textSize="@dimen/bottom_sheet_text_size" />
 
             <TextView
-                android:id="@+id/pose_inference_time_val"
+                android:id="@+id/inference_time_val"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -59,7 +113,7 @@
                 android:textSize="@dimen/bottom_sheet_text_size" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <!-- Inference time row for Hand -->
+<!--        Temporary disabled, CameraFragment.kt line 389-->
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,16 +121,16 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/hand_inference_time_label"
+                android:id="@+id/result_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="@string/label_hand_inference_time"
+                android:text="@string/label_result"
                 android:textColor="@color/bottom_sheet_text_color"
                 android:textSize="@dimen/bottom_sheet_text_size" />
 
             <TextView
-                android:id="@+id/hand_inference_time_val"
+                android:id="@+id/result_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -110,71 +164,17 @@
             android:max="100"
             android:progress="100" />
 
-        <!-- Slider for zScale -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="zScale" />
-        <SeekBar
-            android:id="@+id/z_scale_seekbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="18" />
-
-        <!-- Inference time row combined -->
-<!--        <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--        &lt;!&ndash; Slider for zScale &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="zScale" />-->
+<!--        <SeekBar-->
+<!--            android:id="@+id/z_scale_seekbar"-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="@dimen/bottom_sheet_default_row_margin"-->
-<!--            android:orientation="horizontal">-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/inference_time_label"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_centerVertical="true"-->
-<!--                android:text="@string/label_inference_time"-->
-<!--                android:textColor="@color/bottom_sheet_text_color"-->
-<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/inference_time_val"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_centerVertical="true"-->
-<!--                android:gravity="end"-->
-<!--                android:text="0ms"-->
-<!--                android:textColor="@color/bottom_sheet_text_color"-->
-<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
-<!--        </androidx.appcompat.widget.LinearLayoutCompat>-->
-
-<!--        Temporary disabled, CameraFragment.kt line 389-->
-<!--        <androidx.appcompat.widget.LinearLayoutCompat-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="@dimen/bottom_sheet_default_row_margin"-->
-<!--            android:orientation="horizontal">-->
-<!--            -->
-<!--            <TextView-->
-<!--                android:id="@+id/result_label"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_centerVertical="true"-->
-<!--                android:text="@string/label_result"-->
-<!--                android:textColor="@color/bottom_sheet_text_color"-->
-<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/result_value"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_centerVertical="true"-->
-<!--                android:gravity="end"-->
-<!--                android:text="0ms"-->
-<!--                android:textColor="@color/bottom_sheet_text_color"-->
-<!--                android:textSize="@dimen/bottom_sheet_text_size" />-->
-<!--        </androidx.appcompat.widget.LinearLayoutCompat>-->
+<!--            android:max="100"-->
+<!--            android:progress="100" />-->
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.core.widget.NestedScrollView>

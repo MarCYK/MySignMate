@@ -151,7 +151,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.PoseLandmarkerListener, 
     // Temporary
     private var xScale = 31 / 100f
     private var yScale = 1f
-    private var zScale = 18 / 100f
+//    private var zScale = 18 / 100f
 
     @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -197,7 +197,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.PoseLandmarkerListener, 
         // temporary
         val xScaleSeekBar = view.findViewById<SeekBar>(R.id.x_scale_seekbar)
         val yScaleSeekBar = view.findViewById<SeekBar>(R.id.y_scale_seekbar)
-        val zScaleSeekBar = view.findViewById<SeekBar>(R.id.z_scale_seekbar)
+//        val zScaleSeekBar = view.findViewById<SeekBar>(R.id.z_scale_seekbar)
 
         fragmentCameraBinding.btnClearSentence.setOnClickListener {
             clearSentence()
@@ -205,10 +205,10 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.PoseLandmarkerListener, 
             // Reset SeekBars to default values
             xScaleSeekBar.progress = 31
             yScaleSeekBar.progress = 100
-            zScaleSeekBar.progress = 18
+//            zScaleSeekBar.progress = 18
 
             // Update scaling factors in TranslatorFragment
-            TranslatorFragment.Translator.updateScalingFactors(0.31f, 1.0f, 0.18f)
+            TranslatorFragment.Translator.updateScalingFactors(0.31f, 1.0f)
         }
 
         fragmentCameraBinding.toggleOverlayButton.setOnClickListener {
@@ -219,7 +219,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.PoseLandmarkerListener, 
         xScaleSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 xScale = progress / 100f
-                TranslatorFragment.Translator.updateScalingFactors(xScale, yScale, zScale)
+                TranslatorFragment.Translator.updateScalingFactors(xScale, yScale)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -229,22 +229,22 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.PoseLandmarkerListener, 
         yScaleSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 yScale = progress / 100f
-                TranslatorFragment.Translator.updateScalingFactors(xScale, yScale, zScale)
+                TranslatorFragment.Translator.updateScalingFactors(xScale, yScale)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        zScaleSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                zScale = progress / 100f
-                TranslatorFragment.Translator.updateScalingFactors(xScale, yScale, zScale)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+//        zScaleSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//                zScale = progress / 100f
+//                TranslatorFragment.Translator.updateScalingFactors(xScale, yScale, zScale)
+//            }
+//
+//            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+//            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+//        })
     }
 
     // function to clear the sentence
@@ -409,15 +409,15 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.PoseLandmarkerListener, 
                 val poseTime = poseInferenceTime ?: 0L
                 val handTime = handInferenceTime ?: 0L
 
-                fragmentCameraBinding.bottomSheetLayout.poseInferenceTimeVal.text =
-                    "$poseTime ms (Pose)"
+//                fragmentCameraBinding.bottomSheetLayout.poseInferenceTimeVal.text =
+//                    "$poseTime ms (Pose)"
+//
+//                fragmentCameraBinding.bottomSheetLayout.handInferenceTimeVal.text =
+//                    "$handTime ms (Hand)"
 
-                fragmentCameraBinding.bottomSheetLayout.handInferenceTimeVal.text =
-                    "$handTime ms (Hand)"
-
-//                val totalTime = poseTime + handTime
-//                fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
-//                    "$totalTime ms (Total)"
+                val totalTime = poseTime + handTime
+                fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
+                    "$totalTime ms (Total)"
 
 
                 // Prediction for the sign gesture
@@ -435,7 +435,7 @@ class CameraFragment : Fragment(), PoseLandmarkerHelper.PoseLandmarkerListener, 
                 }
 
                 fragmentCameraBinding.gestureTextView.text = gesture
-//                fragmentCameraBinding.bottomSheetLayout.resultValue.text = String.format("%s", gesture)
+                fragmentCameraBinding.bottomSheetLayout.resultValue.text = String.format("%s", gesture)
 
                 // Pass both results into the overlay
                 fragmentCameraBinding.overlay.setResults(

@@ -14,7 +14,7 @@ import com.example.mysignmate.R
 
 private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.CAMERA)
 
-class PermissionsFragment : Fragment() {
+class  PermissionsFragment : Fragment() {
 
     private val requestPermissionLauncher =
         registerForActivityResult(

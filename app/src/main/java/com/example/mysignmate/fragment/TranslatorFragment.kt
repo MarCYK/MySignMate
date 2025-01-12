@@ -30,13 +30,15 @@ class TranslatorFragment : Fragment() {
 
         private var xScale = 31 / 100f
         private var yScale = 1f
-        private var zScale = 18 / 100f
+        private var zScale = 0f
+//        private var zScale = 18 / 100f
 
         private val fragmentCameraBinding
             get() = _fragmentCameraBinding!!
 
-        private val confidenceThreshold = 0.75f
+        private val confidenceThreshold = 0.7f
         private var consecutiveGestureCount = 0
+        private var consecutiveResetCount = 0
         private var lastGesture = ""
 
         fun processLandmarks(
@@ -71,6 +73,15 @@ class TranslatorFragment : Fragment() {
             val rightHandLandmarks = rightHandResult ?: emptyList()
 
             val finalLandmarks = (poseLandmarks.let { poseLandmarksList ->
+                // Flatten pose landmarks: x, y, z, but drop visibility
+//                val poseList = poseLandmarksList.flatMap { res ->
+//                    listOf(
+//                        res.x(),
+//                        res.y(),
+//                        res.z(),
+//                    )
+//                }
+
                 // Flatten pose landmarks: x, y, z, visibility
                 val poseList = poseLandmarksList.flatMap { res ->
                     listOf(
@@ -80,6 +91,7 @@ class TranslatorFragment : Fragment() {
                         res.visibility()?.orElse(0.00000000e+00f) ?: 0.00000000e+00f
                     )
                 }
+
                 // Pad the pose landmarks to ensure they have 132 elements
                 val posePadded = poseList + List(132 - poseList.size) { 0.00000000e+00f }
                 posePadded
@@ -124,7 +136,7 @@ class TranslatorFragment : Fragment() {
                 try {
                     // Load the model if not already loaded
                     if (module == null) {
-                        module = LiteModuleLoader.load(assetFilePath(context, "lstm_model.ptl"))
+                        module = LiteModuleLoader.load(assetFilePath(context, "lstm_xyviz_model.ptl"))
 //                        module = LiteModuleLoader.load(assetFilePath(context, "transformer_model.ptl"))
                     }
 
@@ -152,48 +164,63 @@ class TranslatorFragment : Fragment() {
                             predictions.add(maxScoreIdx)
                             val gesture = GestureClasses.GESTURE_CLASSES[maxScoreIdx]
 
-                            if (gesture == "RESET") {
-                                sequence.clear()
-                                return null
-                            }
-
-                            val lastPredictions = predictions.takeLast(20)
+                            val lastPredictions = predictions.takeLast(5)
                             val uniquePredictions = lastPredictions.distinct()
 
-                            if (uniquePredictions.size == 1 && uniquePredictions[0] == maxScoreIdx) {
-                                val currentGesture = gesture
-                                if (currentGesture == lastGesture) {
+                            if (gesture == "RESET") {
+                                consecutiveResetCount++
+                                if (consecutiveResetCount >= 8) {
+                                    sequence.clear()
+                                    consecutiveResetCount = 0
+
+                                    Log.d("reset", "processLandmarks: RESET")
+                                    return null
+                                }
+                            } else {
+                                consecutiveResetCount = 0
+                            }
+
+                            // Check if the gesture is detected consecutively for 3 frames
+                            if (uniquePredictions.size == 1) {
+                                if (gesture == lastGesture) {
                                     consecutiveGestureCount++
                                 } else {
                                     consecutiveGestureCount = 1
-                                    lastGesture = currentGesture
+                                    lastGesture = gesture
                                 }
 
-                                // Gesture is detected consecutively for 5 frames
-                                if (consecutiveGestureCount >= 15) { // Change the threshold as needed
-                                    if (sentence.isNotEmpty() && currentGesture != sentence.last()) {
-                                        sentence.add(currentGesture)
+                                // Gesture is detected consecutively for 3 frames
+                                if (consecutiveGestureCount >= 3) { // Change the threshold as needed
+                                    if (sentence.isNotEmpty() && gesture != sentence.last()) {
+                                        sentence.add(gesture)
                                     } else if (sentence.isEmpty()) {
-                                        sentence.add(currentGesture)
+                                        sentence.add(gesture)
                                     }
-                                    consecutiveGestureCount = 0 // Reset count after adding to sentence
+//                                    Log.d("update", "processLandmarks: $sentence")
+//                                    consecutiveGestureCount = 0 // Reset count after adding to sentence
+
+                                    return Pair(sentence, gesture)
                                 }
                             }
-
-//                            if (uniquePredictions.size == 1 && uniquePredictions[0] == maxScoreIdx) {
-//                                val currentGesture = gesture
-//                                if (sentence.isNotEmpty() && currentGesture != sentence.last()) {
-//                                    sentence.add(currentGesture)
-//                                } else if (sentence.isEmpty()) {
-//                                    sentence.add(currentGesture)
-//                                }
-//                            }
 
                             if (sentence.size > 4) {
                                 sentence = sentence.takeLast(4).toMutableList()
                             }
 
-                            return Pair(sentence, gesture)
+                            // Check if the gesture is detected consecutively for 5 frames
+//                            if (uniquePredictions.size == 1 && uniquePredictions[0] == maxScoreIdx) {
+//                                if (sentence.isNotEmpty() && gesture != sentence.last()) {
+//                                    sentence.add(gesture)
+//                                } else if (sentence.isEmpty()) {
+//                                    sentence.add(gesture)
+//                                }
+//                            }
+//
+//                            if (sentence.size > 4) {
+//                                sentence = sentence.takeLast(4).toMutableList()
+//                            }
+//
+//                            return Pair(sentence, gesture)
                         }
                     } else {
                         // Model loading failed
@@ -203,18 +230,16 @@ class TranslatorFragment : Fragment() {
                     // Handle the exception
                     e.printStackTrace()
                 }
-            } else {
-                println("Received empty landmarks or sequence size less than 30 in Translator")
             }
             return null // Return null for conditions where gesture inference couldn't happen
         }
 
-        fun updateScalingFactors(xScale: Float, yScale: Float, zScale: Float) {
+        fun updateScalingFactors(xScale: Float, yScale: Float) {
             this.xScale = xScale
             this.yScale = yScale
-            this.zScale = zScale
+//            this.zScale = zScale
 
-            Log.d("scale", "updateScalingFactors: $xScale, $yScale, $zScale")
+            Log.d("scale", "updateScalingFactors: $xScale, $yScale")
         }
 
         // Dirty Scaling since webcam and phone camera has different resolution
@@ -261,7 +286,7 @@ class TranslatorFragment : Fragment() {
                 }
 
                 // Debugging
-                println(normalizedPose[32].toList())
+//                println(normalizedPose[1].toList())
 
                 // Normalize hand keypoints
                 fun normalizeHand(handKeypoints: List<List<Float>>, wristKeypoint: List<Float>): List<FloatArray> {
